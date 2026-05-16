@@ -11,7 +11,8 @@ export function setToken(token) {
 
 /** Base URL: empty string uses Vite dev proxy (see vite.config.js). Set VITE_API_URL for production. */
 function baseUrl() {
-  return import.meta.env.VITE_API_URL ?? ''
+  const base = import.meta.env.VITE_API_URL ?? ''
+  return base.replace(/\/$/, '')
 }
 
 function authHeaders() {
@@ -26,7 +27,8 @@ function authHeaders() {
  * @param {RequestInit} [options]
  */
 export async function api(path, options = {}) {
-  const url = `${baseUrl()}${path}`
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  const url = `${baseUrl()}${cleanPath}`
   const res = await fetch(url, {
     ...options,
     headers: { ...authHeaders(), ...options.headers },
